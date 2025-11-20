@@ -3,53 +3,77 @@ require_once __DIR__ . "/../configuracion.php";
 
 class Usuario {
 
+    /* ==========================================
+        BUSCAR USUARIO POR NOMBRE + VERIFICAR PASS
+       ========================================== */
     public function buscarUsuario($nombre, $pass) {
         $conexion = obtenerConexion();
 
-        // Buscamos solo por nombre de usuario
         $sql = "SELECT u.idusuario, u.usnombre, u.uspass, r.rodescripcion AS rol
                 FROM usuario u
                 JOIN usuariorol ur ON ur.idusuario = u.idusuario
-                JOIN rol r        ON r.idrol = ur.idrol
-                WHERE u.usnombre = '$nombre'
+                JOIN rol r ON r.idrol = ur.idrol
+                WHERE u.usnombre = ?
                 LIMIT 1";
 
-        $resultado = $conexion->query($sql);
-        $devuelve = null;
+        $stmt = $conexion->prepare($sql);
+        $stmt->bind_param("s", $nombre);
+        $stmt->execute();
+        $resultado = $stmt->get_result();
 
-        if ($resultado && $resultado->num_rows > 0) {
-            $fila = $resultado->fetch_assoc();
-
-            // Verificamos la contraseña hasheada
-            if (password_verify($pass, $fila['uspass'])) {
-                $devuelve = $fila;   // login OK
-            }
+        if ($resultado->num_rows === 0) {
+            return false; // usuario no encontrado
         }
-        
-        // Si no encontró usuario o el password no coincide
-        return $devuelve;
+
+        $fila = $resultado->fetch_assoc();
+
+        // Comparamos contraseña hasheada
+        if (password_verify($pass, $fila['uspass'])) {
+            return $fila;  // LOGIN OK
+        }
+
+        return false; // contraseña incorrecta
     }
 
+
+
+    /* ==========================================
+        INSERTAR NUEVO USUARIO + ASIGNAR ROL CLIENTE
+       ========================================== */
     public function insertarUsuario($nombre, $email, $hash) {
     $conexion = obtenerConexion();
 
-    // IMPORTANTE: no manejamos roles acá, solo usuario base
-    $sql = "INSERT INTO usuario (usnombre, usmail, uspass)
-            VALUES ('$nombre', '$email', '$hash')";
-        $retorno = false;
-    if ($conexion->query($sql)) {
+    // Verificar SI EL EMAIL YA EXISTE
+    $sqlCheck = "SELECT idusuario FROM usuario WHERE usmail = ?";
+    $stmtCheck = $conexion->prepare($sqlCheck);
+    $stmtCheck->bind_param("s", $email);
+    $stmtCheck->execute();
+    $result = $stmtCheck->get_result();
 
-        // obtener el ID del usuario insertado
-        $idusuario = $conexion->insert_id;
-        
-        // asignar rol por defecto = cliente
-        $sqlRol = "INSERT INTO usuariorol (idusuario, idrol) VALUES ($idusuario, 2)";
-        $conexion->query($sqlRol);
-
-        $retorno = true;
+    if ($result->num_rows > 0) {
+        return false; // El email ya existe
     }
 
-    return $retorno;
+    // Insertar usuario (nombre puede repetirse)
+    $sql = "INSERT INTO usuario (usnombre, usmail, uspass) VALUES (?, ?, ?)";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("sss", $nombre, $email, $hash);
+
+    if (!$stmt->execute()) {
+        return false;
+    }
+
+    // Obtener ID insertado
+    $idusuario = $conexion->insert_id;
+
+    // Asignar rol por defecto = cliente (idrol = 2)
+    $sqlRol = "INSERT INTO usuariorol (idusuario, idrol) VALUES (?, 2)";
+    $stmtRol = $conexion->prepare($sqlRol);
+    $stmtRol->bind_param("i", $idusuario);
+    $stmtRol->execute();
+
+    return true;
 }
+
 
 }

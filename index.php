@@ -1,52 +1,140 @@
 <?php
 require_once "configuracion.php";
-require_once "utils/seguridad.php";
+require_once "Control/Session.php";
 
-$control = isset($_GET['control']) ? $_GET['control'] : 'home';
-$accion  = isset($_GET['accion']) ? $_GET['accion'] : 'index';
+$control = $_GET['control'] ?? 'home';
+$accion  = $_GET['accion'] ?? 'index';
 
 switch ($control) {
 
-    case 'producto':
-        require_once "Control/productoControl.php";
-        $controlador = new ProductoControl();
-        if ($accion == 'listar') {
-            $controlador->listar();
-        } else {
-            $controlador->index();
+    /* ===========================
+       LOGIN
+       =========================== */
+    case 'login':
+        require_once "Control/loginControl.php";
+        $login = new LoginControl();
+
+        switch ($accion) {
+            case 'form':
+                $login->form();
+                break;
+
+            case 'validar':
+                $login->validar();
+                break;
+
+            case 'logout':
+                $login->logout();
+                break;
+
+            case 'registro':
+                $login->registroForm();
+                break;
+
+            case 'registrar':
+                $login->registrarUsuario();
+                break;
+
+            default:
+                $login->form();
         }
         break;
 
-case 'login':
-    require_once "Control/loginControl.php";
-    $login = new LoginControl();
 
-    if ($accion == 'form') {
-        $login->form();
-    } elseif ($accion == 'validar') {
-        $login->validar();
-    } elseif ($accion == 'logout') {
-        $login->logout();
-    } elseif ($accion == 'registro') {
-        $login->registroForm();
-    } elseif ($accion == 'registrarUsuario') {
-        $login->registrarUsuario();
+
+    /* ===========================
+       PRODUCTOS
+       =========================== */
+case 'producto':
+    require_once "Control/productoControl.php";
+    $p = new ProductoControl();
+
+    switch ($accion) {
+
+        case 'listar':
+            $p->listar();
+            break;
+
+        case 'nuevo':
+            $p->nuevo();
+            break;
+
+        case 'guardar':
+            $p->guardar();
+            break;
+
+        case 'editar':
+            $p->editar();
+            break;
+
+        case 'actualizar':
+            $p->actualizar();
+            break;
+
+        case 'deshabilitar':
+            $p->deshabilitar();
+            break;
+
+        default:
+            $p->listar();
     }
     break;
 
 
+
+
+    /* ===========================
+       PANEL PRIVADO
+       =========================== */
     case 'panel':
         require_once "Control/panelControl.php";
         $panel = new PanelControl();
-        if ($accion == 'ver') {
-            $panel->ver();
-        }
+        $panel->ver();
         break;
 
+
+
+    /* ===========================
+       CONTACTO (nuevo)
+       =========================== */
+    case 'contacto':
+        include "Vistas/estructura/cabecera.php";
+        include "Vistas/contacto.php";
+        include "Vistas/estructura/pie.php";
+        break;
+
+
+
+    /* ===========================
+       HOME PÚBLICA
+       =========================== */
     case 'home':
     default:
         include "Vistas/estructura/cabecera.php";
         include "Vistas/home.php";
         include "Vistas/estructura/pie.php";
         break;
+
+
+    case 'menu':
+        require_once "Control/menuControl.php";
+        $mc = new MenuControl();
+
+        if ($accion == "listar")      $mc->listar();
+        elseif ($accion == "nuevoForm") $mc->nuevoForm();
+        elseif ($accion == "nuevo")     $mc->nuevo();
+        elseif ($accion == "deshabilitar") $mc->deshabilitar();
+        break;
+
+
+        case 'carrito':
+    require_once "Control/carritoControl.php";
+    $car = new CarritoControl();
+
+    if ($accion == "agregar")      $car->agregar();
+    elseif ($accion == "ver")      $car->ver();
+    elseif ($accion == "quitar")   $car->quitar();
+    break;
+
 }
+?>

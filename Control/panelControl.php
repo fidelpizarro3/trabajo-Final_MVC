@@ -1,12 +1,21 @@
 <?php
-require_once __DIR__ . "/../utils/seguridad.php";
+require_once __DIR__ . "/session.php";
 
 class PanelControl {
 
     public function ver() {
-        verificarLogin(); // solo logueados
 
-        $rol = rolUsuario();
+        // Módulo de autenticación 
+        $session = new Session();
+
+        // Validar sesión activa
+        if (!$session->validar()) {
+            header("Location: index.php?control=login&accion=form");
+            exit;
+        }
+
+        // Obtener rol del usuario
+        $rol = $session->getRol();
 
         include __DIR__ . "/../Vistas/estructura/cabecera.php";
 

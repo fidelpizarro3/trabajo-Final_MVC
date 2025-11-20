@@ -1,18 +1,30 @@
-<h2>Registro de Usuario</h2>
+<div class="container d-flex justify-content-center mt-5">
+    <div class="card shadow p-4" style="max-width: 450px; width: 100%;">
+        <h3 class="text-center mb-4">Crear Cuenta</h3>
 
-<form method="POST" action="index.php?control=login&accion=registrarUsuario">
-    
-    <label>Nombre de usuario:</label><br>
-    <input type="text" name="usuario" required><br><br>
+        <form method="POST" action="/proyecto-Final-MVC/index.php?control=login&accion=registrar">
 
-    <label>Email:</label><br>
-    <input type="email" name="email" required><br><br>
+            <div class="mb-3">
+                <label class="form-label">Usuario</label>
+                <input type="text" class="form-control" name="usuario" required>
+            </div>
 
-    <label>Contraseña:</label><br>
-    <input type="password" name="clave" required><br><br>
+            <div class="mb-3">
+                <label class="form-label">Correo</label>
+                <input type="email" class="form-control" name="email" required>
+            </div>
 
-    <button type="submit">Registrarse</button>
-</form>
+            <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <input type="password" class="form-control" name="clave" required>
+            </div>
 
-<br>
-<a href="index.php?control=login&accion=form">¿Ya tenés cuenta? Iniciar sesión</a>
+            <button class="btn btn-success w-100">Registrarme</button>
+
+            <div class="text-center mt-3">
+                <a href="index.php?control=login&accion=form" class="text-decoration-none">Volver al login</a>
+            </div>
+
+        </form>
+    </div>
+</div>

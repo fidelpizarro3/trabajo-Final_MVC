@@ -30,7 +30,7 @@ class LoginControl {
         $nombre = $_POST['usuario'] ?? "";
         $pass   = $_POST['clave'] ?? "";
 
-        // Si vienen vacíos
+        // Validación básica
         if ($nombre === "" || $pass === "") {
             include __DIR__ . "/../Vistas/estructura/cabecera.php";
             echo "<h3>Debe completar usuario y contraseña</h3>";
@@ -39,31 +39,39 @@ class LoginControl {
             return;
         }
 
+        // Buscar usuario en la BD
         $modeloUsuario = new Usuario();
         $datos = $modeloUsuario->buscarUsuario($nombre, $pass);
 
-        // Módulo de autenticación 
         $session = new Session();
 
         if ($datos != false) {
 
-            // Iniciar la sesión según 
-            $session->iniciar($datos['usnombre'], $pass);
+            // Guardar toda la data del usuario
+            $session->iniciar(
+                $datos['usnombre'],   // usuario
+                $pass,                // sin hash
+                $datos['idusuario'],  // ID
+                $datos['rol']         // admin / cliente
+            );
 
-            // Guardar información adicional
-            $_SESSION['idusuario'] = $datos['idusuario'];
-            $_SESSION['rol']       = $datos['rol'];   // admin / cliente
+            // 👉 Redirecciones según rol
+            if ($datos['rol'] === "admin") {
+                header("Location: index.php?control=panel&accion=ver");
+            } else {
+                header("Location: index.php?control=producto&accion=listar");
+            }
 
-            header("Location: index.php?control=panel&accion=ver");
             exit;
-
-        } else {
-            include __DIR__ . "/../Vistas/estructura/cabecera.php";
-            echo "<h3>Error: usuario o contraseña incorrectos</h3>";
-            echo "<a href='index.php?control=login&accion=form'>Volver</a>";
-            include __DIR__ . "/../Vistas/estructura/pie.php";
         }
+
+        // Error
+        include __DIR__ . "/../Vistas/estructura/cabecera.php";
+        echo "<h3>Error: usuario o contraseña incorrectos</h3>";
+        echo "<a href='index.php?control=login&accion=form'>Volver</a>";
+        include __DIR__ . "/../Vistas/estructura/pie.php";
     }
+
 
     /**
      * Cierra sesión
@@ -76,7 +84,7 @@ class LoginControl {
     }
 
     /**
-     * Procesa formulario de registro e inserta usuario nuevo
+     * Procesa formulario de registro
      */
     public function registrarUsuario() {
 
@@ -93,11 +101,8 @@ class LoginControl {
         }
 
         $modeloUsuario = new Usuario();
-
-        // Hash seguro
         $hash = password_hash($clave, PASSWORD_DEFAULT);
 
-        // Insertar usuario y asignar rol cliente automáticamente en la BD
         $ok = $modeloUsuario->insertarUsuario($nombre, $email, $hash);
 
         if ($ok) {
@@ -105,7 +110,7 @@ class LoginControl {
             exit;
         } else {
             include __DIR__ . "/../Vistas/estructura/cabecera.php";
-            echo "<h3>Error al registrar. El usuario ya existe o hubo un problema.</h3>";
+            echo "<h3>Error al registrar. El usuario puede ya existir.</h3>";
             echo "<a href='index.php?control=login&accion=registro'>Volver</a>";
             include __DIR__ . "/../Vistas/estructura/pie.php";
         }
