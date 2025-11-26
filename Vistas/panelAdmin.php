@@ -1,3 +1,10 @@
+<?php
+if (!defined('ACCESO_PERMITIDO')) {
+    die("Acceso directo NO permitido.");
+}
+?>
+
+
 <h2 class="fw-bold mb-4">Panel de Administrador</h2>
 
 <p class="text-muted fs-5">
@@ -30,7 +37,7 @@
         </div>
     </div>
 
-    <!-- Gestionar Menú Dinámico -->
+    <!-- Gestionar Menú Dinámico
     <div class="col-md-6 mb-3">
         <div class="card shadow-sm">
             <div class="card-body">
@@ -43,18 +50,21 @@
                 </a>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- Estado de compras -->
-    <div class="col-md-6 mb-3">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h4 class="card-title">Estado de compras</h4>
-                <p class="card-text">Aceptar, enviar o cancelar compras.</p>
-                <a href="#" class="btn btn-outline-secondary disabled">Próximamente</a>
-            </div>
+<div class="col-md-6 mb-3">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title">Estado de compras</h4>
+            <p class="card-text">Aceptar, enviar o cancelar compras.</p>
+            <a href="index.php?control=admincompra&accion=listar" class="btn btn-warning">
+                Ver compras
+            </a>
         </div>
     </div>
+</div>
+
 
 </div>
 

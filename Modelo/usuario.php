@@ -74,6 +74,57 @@ class Usuario {
 
     return true;
 }
+/* ==========================================
+    GUARDAR TOKEN DE RECORDAR USUARIO
+   ========================================== */
+public function guardarToken($idusuario, $token) {
+    $conexion = obtenerConexion();
+
+    $sql = "UPDATE usuario 
+            SET ustoken = ?, 
+                ustoken_expira = DATE_ADD(NOW(), INTERVAL 7 DAY)
+            WHERE idusuario = ?";
+
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("si", $token, $idusuario);
+    return $stmt->execute();
+}
+
+/* ==========================================
+    BUSCAR USUARIO POR TOKEN (AUTOLOGIN)
+   ========================================== */
+public function buscarPorToken($token) {
+    $conexion = obtenerConexion();
+
+    $sql = "SELECT u.idusuario, u.usnombre, r.rodescripcion AS rol
+            FROM usuario u
+            JOIN usuariorol ur ON u.idusuario = ur.idusuario
+            JOIN rol r ON r.idrol = ur.idrol
+            WHERE u.ustoken = ?
+              AND u.ustoken_expira > NOW()
+            LIMIT 1";
+
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("s", $token);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+/* ==========================================
+    BORRAR TOKEN (LOGOUT)
+   ========================================== */
+public function borrarToken($idusuario) {
+    $conexion = obtenerConexion();
+
+    $sql = "UPDATE usuario 
+            SET ustoken = NULL, ustoken_expira = NULL
+            WHERE idusuario = ?";
+
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("i", $idusuario);
+    return $stmt->execute();
+}
+
 
 
 }

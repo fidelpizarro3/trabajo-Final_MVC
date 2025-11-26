@@ -1,81 +1,91 @@
 <h2 class="mb-4">Mi Carrito</h2>
 
 <?php if (empty($items)): ?>
-
     <div class="alert alert-info text-center">
-        <h5>Tu carrito está vacío 😕</h5>
-        <a href="index.php?control=producto&accion=listar" class="btn btn-primary mt-3">
-            Ver productos
-        </a>
+        Tu carrito está vacío 
     </div>
 
 <?php else: ?>
 
-    <table class="table table-bordered align-middle text-center">
-        <thead class="table-light">
-            <tr>
-                <th>Imagen</th>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Subtotal</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
+<?php  
+$total = 0;
+?>
 
-        <tbody>
+<div class="carrito-items">
 
-            <?php 
-            $total = 0;
+<?php foreach ($items as $item): ?>
 
-            foreach ($items as $item): 
-                $total += $item["subtotal"];
-            ?>
+    <?php  
+        // ahora sí, item ya existe
+        $total += $item["subtotal"];
 
-                <tr>
-                    <td style="width:140px;">
-                        <img src="Vistas/img/<?= $item['proimagen'] ?>" 
-                             alt="" class="img-fluid rounded"
-                             style="height:90px; object-fit:cover;">
-                    </td>
+        $img = "Vistas/img/" . ($item["proimagen"] ?: "sinimagen.png");
+        if (!file_exists($img)) {
+            $img = "https://via.placeholder.com/120x120?text=Sin+Imagen";
+        }
+    ?>
 
-                    <td>
-                        <h5><?= ucfirst($item['pronombre']) ?></h5>
-                        <small class="text-muted"><?= $item['prodetalle'] ?></small>
-                    </td>
+    <!-- ITEM -->
+    <div class="d-flex align-items-center p-3 mb-3 border rounded shadow-sm">
 
-                    <td style="width:120px;">
-                        <?= $item['cantidad'] ?>
-                    </td>
+        <img src="<?= $img ?>"
+             class="rounded me-3"
+             style="width:100px;height:100px;object-fit:cover;">
 
-                    <td>
-                        $<?= number_format($item['subtotal'], 2) ?>
-                    </td>
+        <div class="flex-grow-1">
+            <h5 class="mb-1"><?= ucfirst($item["pronombre"]) ?></h5>
+            <small class="text-muted"><?= $item["prodetalle"] ?></small>
 
-                    <td>
-                        <a href="index.php?control=carrito&accion=quitar&id=<?= $item['idproducto'] ?>" 
-                           class="btn btn-sm btn-danger">
-                           Eliminar
-                        </a>
-                    </td>
-                </tr>
+<div class="mt-2 d-flex align-items-center">
+    <span class="me-2 fw-semibold">Cantidad:</span>
 
-            <?php endforeach; ?>
+    <a href="index.php?control=carrito&accion=restar&id=<?= $item['idproducto'] ?>"
+       class="btn btn-outline-secondary btn-sm">−</a>
 
-        </tbody>
-    </table>
+    <span class="mx-2"><?= $item["cantidad"] ?></span>
 
+    <a href="index.php?control=carrito&accion=sumar&id=<?= $item['idproducto'] ?>"
+       class="btn btn-outline-secondary btn-sm">+</a>
+</div>
 
-    <div class="text-end mt-4">
-        <h3>Total: <strong>$<?= number_format($total, 2) ?></strong></h3>
+        </div>
 
-        <a href="index.php?control=carrito&accion=vaciar" 
-           class="btn btn-outline-danger mt-3">
+        <div class="text-end me-4">
+            <strong>$<?= number_format($item["subtotal"], 2) ?></strong>
+        </div>
+
+        <a href="index.php?control=carrito&accion=quitar&id=<?= $item['idproducto'] ?>"
+           class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-trash"></i>
+        </a>
+
+    </div>
+
+<?php endforeach; ?>
+
+</div>
+
+<div class="text-end mt-4">
+    <h3>Total: $<?= number_format($total, 2) ?></h3>
+</div>
+
+<div class="d-flex justify-content-between mt-4">
+
+    <a href="index.php?control=producto&accion=listar" class="btn btn-outline-secondary">
+        ← Seguir comprando
+    </a>
+
+    <div>
+        <a href="index.php?control=carrito&accion=vaciar" class="btn btn-danger me-2">
             Vaciar carrito
         </a>
 
-        <a href="#" class="btn btn-success mt-3">
-            Finalizar compra
-        </a>
+<a href="index.php?control=carrito&accion=finalizar" class="btn btn-success">
+    Finalizar compra
+</a>
+
     </div>
+
+</div>
 
 <?php endif; ?>

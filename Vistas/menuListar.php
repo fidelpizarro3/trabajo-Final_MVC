@@ -1,3 +1,9 @@
+<?php
+if (!defined('ACCESO_PERMITIDO')) {
+    die("Acceso directo NO permitido.");
+}
+?>
+
 <h2 class="mb-4 fw-bold">Administración del Menú</h2>
 
 <a class="btn btn-primary mb-3" href="index.php?control=menu&accion=nuevoForm">

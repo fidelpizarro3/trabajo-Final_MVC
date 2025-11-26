@@ -1,0 +1,18 @@
+{
+    "name": "usuario/proyecto-final-mvc",
+    "autoload": {
+        "psr-4": {
+            "Usuario\\ProyectoFinalMvc\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Fidel Pizarro",
+            "email": "fidelpizarro11@gmail.com"
+        }
+    ],
+    "require": {
+        "laminas/laminas-mail": "^2.25",
+        "laminas/laminas-mime": "^2.12"
+    }
+}

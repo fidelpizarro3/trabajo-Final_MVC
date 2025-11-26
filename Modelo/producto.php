@@ -1,19 +1,14 @@
 <?php
 require_once __DIR__ . "/../configuracion.php";
 
-class Producto {
+class Producto
+{
 
-    /* ============================================================
-       LISTAR TODOS LOS PRODUCTOS
-    ============================================================ */
-    public function listarTodos() {
+    public function listarTodos()
+    {
         $conexion = obtenerConexion();
-
-        $sql = "SELECT idproducto, pronombre, prodetalle, procantstock, proimagen 
-                FROM producto";
-
+        $sql = "SELECT idproducto, pronombre, prodetalle, procantstock, precio, proimagen FROM producto";
         $res = $conexion->query($sql);
-
         $lista = [];
         if ($res && $res->num_rows > 0) {
             while ($fila = $res->fetch_assoc()) {
@@ -23,75 +18,65 @@ class Producto {
         return $lista;
     }
 
-
-    /* ============================================================
-       BUSCAR PRODUCTO POR ID
-    ============================================================ */
-    public function buscarPorId($id) {
+    public function buscarPorId($id)
+    {
         $conexion = obtenerConexion();
-
         $sql = "SELECT * FROM producto WHERE idproducto = ?";
         $stmt = $conexion->prepare($sql);
         $stmt->bind_param("i", $id);
         $stmt->execute();
-
         return $stmt->get_result()->fetch_assoc();
     }
 
-
-    /* ============================================================
-       INSERTAR PRODUCTO
-    ============================================================ */
-    public function insertar($nombre, $detalle, $stock, $imagenNombre) {
+    public function insertar($nombre, $detalle, $stock, $precio, $imagenNombre)
+    {
         $conexion = obtenerConexion();
-
-        $sql = "INSERT INTO producto (pronombre, prodetalle, procantstock, proimagen)
-                VALUES (?, ?, ?, ?)";
-
+        $sql = "INSERT INTO producto (pronombre, prodetalle, procantstock, precio, proimagen)
+                VALUES (?, ?, ?, ?, ?)";
         $stmt = $conexion->prepare($sql);
-        $stmt->bind_param("ssis", $nombre, $detalle, $stock, $imagenNombre);
-
+        $stmt->bind_param("ssids", $nombre, $detalle, $stock, $precio, $imagenNombre);
         return $stmt->execute();
     }
 
-
-    /* ============================================================
-       ACTUALIZAR PRODUCTO
-    ============================================================ */
-    public function actualizar($id, $nombre, $detalle, $stock, $nuevaImagen) {
-    $conexion = obtenerConexion();
-
-    // Si NO se subió nueva imagen → mantener la actual
-    if ($nuevaImagen === null) {
-        $sql = "UPDATE producto
-                SET pronombre = ?, prodetalle = ?, procantstock = ?
-                WHERE idproducto = ?";
-        $stmt = $conexion->prepare($sql);
-        $stmt->bind_param("ssii", $nombre, $detalle, $stock, $id);
-
-    } else {
-        $sql = "UPDATE producto
-                SET pronombre = ?, prodetalle = ?, procantstock = ?, proimagen = ?
-                WHERE idproducto = ?";
-        $stmt = $conexion->prepare($sql);
-        $stmt->bind_param("ssisi", $nombre, $detalle, $stock, $nuevaImagen, $id);
+    public function actualizar($id, $nombre, $detalle, $stock, $precio, $nuevaImagen)
+    {
+        $conexion = obtenerConexion();
+        if ($nuevaImagen === null) {
+            $sql = "UPDATE producto 
+                    SET pronombre = ?, prodetalle = ?, procantstock = ?, precio = ?
+                    WHERE idproducto = ?";
+            $stmt = $conexion->prepare($sql);
+            $stmt->bind_param("ssidi", $nombre, $detalle, $stock, $precio, $id);
+        } else {
+            $sql = "UPDATE producto 
+                    SET pronombre = ?, prodetalle = ?, procantstock = ?, precio = ?, proimagen = ?
+                    WHERE idproducto = ?";
+            $stmt = $conexion->prepare($sql);
+            $stmt->bind_param("ssidsi", $nombre, $detalle, $stock, $precio, $nuevaImagen, $id);
+        }
+        return $stmt->execute();
     }
 
-    return $stmt->execute();
-}
-
-
+    /* ============================================================
+       NUEVO: Verificar si hay stock suficiente
+    ============================================================ */
+    public function hayStock($idproducto, $cantidadNecesaria)
+    {
+        $producto = $this->buscarPorId($idproducto);
+        return $producto && $producto["procantstock"] >= $cantidadNecesaria;
+    }
 
     /* ============================================================
-       ELIMINAR PRODUCTO
+       NUEVO: Descontar stock del producto
     ============================================================ */
-    public function eliminar($id) {
+    public function descontarStock($idproducto, $cantidad)
+    {
         $conexion = obtenerConexion();
-
-        $sql = "DELETE FROM producto WHERE idproducto = ?";
+        $sql = "UPDATE producto 
+                SET procantstock = procantstock - ?
+                WHERE idproducto = ? AND procantstock >= ?";
         $stmt = $conexion->prepare($sql);
-        $stmt->bind_param("i", $id);
-
+        $stmt->bind_param("iii", $cantidad, $idproducto, $cantidad);
         return $stmt->execute();
     }
 }

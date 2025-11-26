@@ -41,6 +41,7 @@ class ProductoControl {
         $nombre  = $_POST['nombre'];
         $detalle = $_POST['detalle'];
         $stock   = $_POST['stock'];
+        $precio  = $_POST['precio'];
 
         // Imagen
         $imagenNombre = null;
@@ -52,7 +53,7 @@ class ProductoControl {
         }
 
         $producto = new Producto();
-        $producto->insertar($nombre, $detalle, $stock, $imagenNombre);
+        $producto->insertar($nombre, $detalle, $stock,$precio, $imagenNombre);
 
         header("Location: index.php?control=producto&accion=listar");
     }
@@ -77,6 +78,7 @@ public function actualizar() {
     $nombre  = $_POST['nombre'];
     $detalle = $_POST['detalle'];
     $stock   = $_POST['stock'];
+    $precio  = $_POST['precio'];
 
     // Manejo de imagen
     $nuevaImagen = null;
@@ -88,7 +90,7 @@ public function actualizar() {
     }
 
     $producto = new Producto();
-    $producto->actualizar($id, $nombre, $detalle, $stock, $nuevaImagen);
+    $producto->actualizar($id, $nombre, $detalle, $stock,$precio, $nuevaImagen);
 
     header("Location: index.php?control=producto&accion=listar");
     exit;
@@ -104,6 +106,18 @@ public function deshabilitar() {
     $producto->eliminar($id);
 
     header("Location: index.php?control=producto&accion=listar");
+}
+
+
+public function datosAjax() {
+
+    require_once __DIR__ . "/../Modelo/producto.php";
+    $p = new Producto();
+    $id = $_GET['id'] ?? 0;
+
+    $prod = $p->buscarPorId($id);
+
+    echo json_encode($prod);
 }
 
 }

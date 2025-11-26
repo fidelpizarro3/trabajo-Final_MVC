@@ -9,15 +9,13 @@ class Session {
     }
 
     /**
-     
-     * iniciar($nombreUsuario, $psw)
-     * Además guardo rol e idusuario
+     * Inicia la sesión guardando usuario, password, idusuario y rol.
      */
     public function iniciar($usuario, $psw, $idusuario = null, $rol = null) {
-        $_SESSION['usuario']   = $usuario;    
-        $_SESSION['password']  = $psw;        
-        $_SESSION['idusuario'] = $idusuario;   
-        $_SESSION['rol']       = $rol;         // admin / cliente
+        $_SESSION['usuario']   = $usuario;
+        $_SESSION['password']  = $psw;
+        $_SESSION['idusuario'] = $idusuario;
+        $_SESSION['rol']       = $rol;   // ej: 'admin', 'cliente', 'deposito'
     }
 
     /**
@@ -27,9 +25,7 @@ class Session {
         return isset($_SESSION['usuario']) && isset($_SESSION['password']);
     }
 
-    /**
-     * Alias de validar()
-     */
+    /** Alias de validar() */
     public function activa() {
         return $this->validar();
     }
@@ -50,7 +46,7 @@ class Session {
      * Cierra la sesión correctamente.
      */
     public function cerrar() {
-        $_SESSION = [];          // limpiar datos
-        session_destroy();       // destruir sesión
+        $_SESSION = [];
+        session_destroy();
     }
 }

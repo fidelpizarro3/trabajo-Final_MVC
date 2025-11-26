@@ -55,11 +55,11 @@ class LoginControl {
                 $datos['rol']         // admin / cliente
             );
 
-            // 👉 Redirecciones según rol
+            //  Redirecciones según rol
             if ($datos['rol'] === "admin") {
                 header("Location: index.php?control=panel&accion=ver");
             } else {
-                header("Location: index.php?control=producto&accion=listar");
+                header("Location: index.php?home.php");
             }
 
             exit;

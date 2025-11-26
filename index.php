@@ -45,41 +45,44 @@ switch ($control) {
     /* ===========================
        PRODUCTOS
        =========================== */
-case 'producto':
-    require_once "Control/productoControl.php";
-    $p = new ProductoControl();
+    case 'producto':
+        require_once "Control/productoControl.php";
+        $p = new ProductoControl();
 
-    switch ($accion) {
+        switch ($accion) {
 
-        case 'listar':
-            $p->listar();
-            break;
+            case 'listar':
+                $p->listar();
+                break;
 
-        case 'nuevo':
-            $p->nuevo();
-            break;
+            case 'nuevo':
+                $p->nuevo();
+                break;
 
-        case 'guardar':
-            $p->guardar();
-            break;
+            case 'guardar':
+                $p->guardar();
+                break;
 
-        case 'editar':
-            $p->editar();
-            break;
+            case 'editar':
+                $p->editar();
+                break;
 
-        case 'actualizar':
-            $p->actualizar();
-            break;
+            case 'actualizar':
+                $p->actualizar();
+                break;
 
-        case 'deshabilitar':
-            $p->deshabilitar();
-            break;
+            case 'deshabilitar':
+                $p->deshabilitar();
+                break;
 
-        default:
-            $p->listar();
-    }
-    break;
+            case 'datosAjax':
+                $p->datosAjax();
+                break;
 
+            default:
+                $p->listar();
+        }
+        break;
 
 
 
@@ -95,7 +98,7 @@ case 'producto':
 
 
     /* ===========================
-       CONTACTO (nuevo)
+       CONTACTO
        =========================== */
     case 'contacto':
         include "Vistas/estructura/cabecera.php";
@@ -106,7 +109,54 @@ case 'producto':
 
 
     /* ===========================
-       HOME PÚBLICA
+       MENÚ DINÁMICO
+       =========================== */
+    case 'menu':
+        require_once "Control/menuControl.php";
+        $mc = new MenuControl();
+
+        if ($accion == "listar")           $mc->listar();
+        elseif ($accion == "nuevoForm")    $mc->nuevoForm();
+        elseif ($accion == "nuevo")        $mc->nuevo();
+        elseif ($accion == "deshabilitar") $mc->deshabilitar();
+        break;
+
+
+
+    /* ===========================
+       CARRITO
+       =========================== */
+    case 'carrito':
+        require_once "Control/carritoControl.php";
+        $car = new CarritoControl();
+
+        if     ($accion == "agregar")   $car->agregar();
+        elseif ($accion == "ver")       $car->ver();
+        elseif ($accion == "quitar")    $car->quitar();
+        elseif ($accion == "vaciar")    $car->vaciar();
+        elseif ($accion == "sumar")     $car->sumar();
+        elseif ($accion == "restar")    $car->restar();
+        elseif ($accion == "finalizar") $car->finalizar();
+        break;
+
+
+
+    /* ===========================
+       COMPRAS DEL USUARIO
+       =========================== */
+    case 'compra':
+        require_once "Control/compraControl.php";
+        $cc = new CompraControl();
+
+        if ($accion == "listar") {
+            $cc->listar();
+        }
+        break;
+
+
+
+    /* ===========================
+       HOME PÚBLICA (DEFAULT)
        =========================== */
     case 'home':
     default:
@@ -116,25 +166,15 @@ case 'producto':
         break;
 
 
-    case 'menu':
-        require_once "Control/menuControl.php";
-        $mc = new MenuControl();
+    case 'admincompra':
+    require_once "Control/adminCompraControl.php";
+    $ac = new AdminCompraControl();
 
-        if ($accion == "listar")      $mc->listar();
-        elseif ($accion == "nuevoForm") $mc->nuevoForm();
-        elseif ($accion == "nuevo")     $mc->nuevo();
-        elseif ($accion == "deshabilitar") $mc->deshabilitar();
-        break;
-
-
-        case 'carrito':
-    require_once "Control/carritoControl.php";
-    $car = new CarritoControl();
-
-    if ($accion == "agregar")      $car->agregar();
-    elseif ($accion == "ver")      $car->ver();
-    elseif ($accion == "quitar")   $car->quitar();
+    if ($accion == "listar")       $ac->listar();
+    elseif ($accion == "cambiarEstado") $ac->cambiarEstado();
     break;
 
 }
+
+
 ?>
